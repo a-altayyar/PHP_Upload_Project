@@ -10,6 +10,13 @@
 <body>
 
     <?php
+    session_start();
+    if (isset($_SESSION['id'])) {
+        echo '<p> Welcome ' . $_SESSION['name'] . ' <a href="./logout.php">Logout</a></p>';
+    } else {
+        header("Location: login.php");
+    }
+
     //Connect to MySQL
     include './DB-CONFIG.php';
     $con = mysqli_connect(DBHOST, DBUSER, DBPWD, DBNAME);
