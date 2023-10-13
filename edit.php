@@ -21,7 +21,7 @@
     //select the user
     //edit.php?id=1 => $_GET['id']
     $id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
-    $select = "SELECT * FROM listpro WHERE `listpro`.`id` = " . $id . " LIMIT 1";
+    $select = "SELECT * FROM userlist WHERE `userlist`.`id` = " . $id . " LIMIT 1";
     $result = mysqli_query($con, $select);
     $row = mysqli_fetch_assoc($result);
 
@@ -34,21 +34,31 @@
         if (!(isset($_POST['edit_email']) && filter_input(INPUT_POST, 'edit_email', FILTER_VALIDATE_EMAIL))) {
             $error_fields[] = "email";
         }
-        if (!(isset($_POST['edit_psw']) && strlen($_POST['edit_psw']) > 5)) {
-            $error_fields[] = "Password";
+        if (!(isset($_POST['old_psw']) && strlen($_POST['old_psw']) > 5)) {
+            $error_fields[] = "old_Password";
+        }
+        if (!(isset($_POST['new_psw']) && strlen($_POST['new_psw']) > 5)) {
+            $error_fields[] = "new_Password";
+        }
+        //this if condition to ensure that password matches in the DataBase. if it matches, the password change is complete. 
+        if (password_verify($_POST['old_psw'], $row['password'])) {
+            $user_hashed_password = password_hash(trim($_POST['new_psw']), PASSWORD_DEFAULT);
+        } else {
+            $error_fields[] = "Password_in_correct";
         }
 
         if (!$error_fields) {
 
-            //Escape any sepcial characters to avoid SQL Injection
+
             $idd = filter_input(INPUT_POST, 'her', FILTER_SANITIZE_NUMBER_INT);
-            $name = mysqli_escape_string($con, $_POST['edit_name']);
-            $em = mysqli_escape_string($con, $_POST['edit_email']);
-            $password = sha1($_POST['edit_psw']);
+            //Escape any sepcial characters to avoid SQL Injection
+            // trim to deal with the unneeded white lift and right spaces 
+            $user_name = mysqli_escape_string($con, trim($_POST['edit_name']));
+            $user_email = mysqli_escape_string($con, trim($_POST['edit_email']));
             $admin = (isset($_POST['edit_admin'])) ? 1 : 0;
 
             //Update the data
-            $query = "UPDATE `listpro` SET `id` = '$id', `name` = '$name', `email` = '$em', `password` = '$password', `adminn` = '$admin' WHERE `listpro`.`id` = '$idd'";
+            $query = "UPDATE `userlist` SET `id` = '$id', `name` = '$user_name', `email` = '$user_email', `password` = '$user_hashed_password', `admin` = '$admin' WHERE `userlist`.`id` = '$idd'";
             if (mysqli_query($con, $query)) {
                 header("Location: list.php");
                 exit;
@@ -83,14 +93,23 @@
                 echo "* Please enter a valid email"; ?>
         </label><br>
 
-        <label>Password :
-            <input type="password" name="edit_psw" value="<?= (isset($row['password'])) ? $row['password'] : '' ?>">
-            <?php if (in_array("Password", $error_fields))
-                echo "* Please enter a password not less then 6 characters"; ?>
+        <label>Old Password :
+            <input type="text" name="old_psw">
+            <?php if (in_array("old_Password", $error_fields)) {
+                echo "* Please enter a password not less then 6 characters";
+            } elseif (in_array("Password_in_correct", $error_fields)) {
+                echo "* a password is Password in-correct";
+            } ?>
+        </label><br>
+        <label>New Password :
+            <input type="text" name="new_psw">
+            <?php if (in_array("new_Password", $error_fields))
+                echo "* Please enter a password not less then 6 characters";
+            ?>
         </label><br>
 
         <label>Admin :
-            <input type="checkbox" name="edit_admin" <?= ($row['adminn']) ? 'checked' : '' ?>>
+            <input type="checkbox" name="edit_admin" <?= ($row['admin']) ? 'checked' : '' ?>>
         </label><br>
 
 

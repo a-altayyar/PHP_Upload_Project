@@ -19,13 +19,13 @@
     }
 
     //Select all users
-    $query = "SELECT * FROM listpro";
+    $query = "SELECT * FROM userlist";
 
 
     //Search by the name or the email
     if (isset($_GET['add_search'])) {
         $search = mysqli_escape_string($con, $_GET['add_search']);
-        $query .= " WHERE `listpro`.`name` LIKE '%" . $search . "%' OR `listpro`.`email` LIKE '%" . $search . "%'";
+        $query .= " WHERE `userlist`.`name` LIKE '%" . $search . "%' OR `userlist`.`email` LIKE '%" . $search . "%'";
     }
 
     $result = mysqli_query($con, $query);
@@ -47,7 +47,6 @@
                 <th>Id</th>
                 <th>Name</th>
                 <th>Email</th>
-                <th>psw</th>
                 <th>Admin</th>
                 <th>Actions</th>
             </tr>
@@ -68,17 +67,14 @@
                         <?= $row['email'] ?>
                     </td>
                     <td>
-                        <?= $row['password'] ?>
-                    </td>
-                    <td>
-                        <?php if ($row['avatar']) { ?>
+                        <?php if (!empty($row['avatar'])) { ?>
                             <img src="./uploads/<?= $row['avatar'] ?>" style="width: 100px; height: 100px" />
                         <?php } else { ?>
-                            <img src="./uploads/die3.png" style="width: 100px; height: 100px" />
+                            <img src="./uploads/nothing_img.png" style="width: 100px; height: 100px" />
                         <?php } ?>
                     </td>
                     <td>
-                        <?= ($row['adminn']) ? 'Yes' : 'No' ?>
+                        <?= ($row['admin']) ? 'Yes' : 'No' ?>
                     </td>
                     <td> <a href="edit.php?id=<?= $row['id'] ?>">Edit</a> | <a
                             href="delete.php?id=<?= $row['id'] ?>">Delete</a> </td>
@@ -91,15 +87,14 @@
 
         <tfoot>
             <tr>
-                <td colspan="3" style="text-align: center">
+                <td colspan="2" style="text-align: center">
                     <?= mysqli_num_rows($result) ?> User
                 </td>
-                <td colspan="3" style="text-align: center"><a href="addnew.php">Add User</a></td>
+                <td colspan="3" style="text-align: center"><a href="add.php">Add User</a></td>
             </tr>
 
         </tfoot>
     </table>
-
 
     <?php
     mysqli_free_result($result);

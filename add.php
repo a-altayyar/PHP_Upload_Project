@@ -25,17 +25,32 @@
             $error_fields[] = "Password";
         }
 
+        $img_file = $_FILES["avatar"];
+        $img_name = $img_file['name'];
 
         // Set allowed files Extensions
         $allowed_extensions = array('jpg', 'gif', 'jpeg', 'png');
         //Get files Extension
-        $image_extension = strtolower(end(explode('.', $_FILES["avatar"]['name'])));
+        $tmp = explode('.', $img_name);
+        $image_extension = strtolower(end($tmp));
 
 
-        // Check fils size 
-        if ($_FILES["avatar"]['size'] > 8000) {
-            $error_fields[] = "file_size";
+
+        // Check file is uploaded
+        if ($_FILES["avatar"]['error'] == 4) {
+            $error_fields[] = "empty";
+        } else {
+            // Check fils size
+            if ($_FILES["avatar"]['size'] > 80000) {
+                $error_fields[] = "file_size";
+            }
+            // Check if File is valid
+            if (!in_array($image_extension, $allowed_extensions)) {
+                $error_fields[] = "not_valid";
+            }
+
         }
+
 
 
         //Connect to DB
@@ -49,17 +64,18 @@
 
 
             //Escape any sepcial characters to avoid SQL Injection
-            $name = mysqli_escape_string($con, $_POST['add_name']);
-            $em = mysqli_escape_string($con, $_POST['add_email']);
-            $password = sha1($_POST['add_psw']);
+            // trim to deal with the unneeded white lift and right spaces 
+            $user_name = mysqli_escape_string($con, trim($_POST['add_name']));
+            $user_email = mysqli_escape_string($con, trim($_POST['add_email']));
+            $user_password = password_hash(trim($_POST['add_psw']), PASSWORD_DEFAULT);
             $admin = (isset($_POST['add_admin'])) ? 1 : 0;
 
-            $uploads_dir = $_SERVER['DOCUMENT_ROOT'] . '\My_Projects\project_php_form\uploads\\';
+            $uploads_dir = $_SERVER['DOCUMENT_ROOT'] . '\My_Projects\project_php_upload\uploads\\';
             $avatar = '';
             if ($_FILES["avatar"]['error'] == UPLOAD_ERR_OK) {
                 $tmp_name = $_FILES["avatar"]["tmp_name"];
                 $avatar = basename($_FILES["avatar"]["name"]);
-                move_uploaded_file($tmp_name, "$uploads_dir/$name.$avatar");
+                move_uploaded_file($tmp_name, "$uploads_dir/$user_name.$avatar");
             } else {
                 echo "File can't be uploaded";
                 exit;
@@ -67,8 +83,8 @@
 
 
             //Insert the data
-            $query = "INSERT INTO `listpro` (`id`, `name`, `email`, `password`, `adminn`, `avatar`)
-                     VALUES (NULL, '$name', '$em', '$password', '$admin', '$name.$avatar');";
+            $query = "INSERT INTO `userlist` (`id`, `name`, `email`, `password`, `admin`, `avatar`)
+                     VALUES (NULL, '$user_name', '$user_email', '$user_password', '$admin', '$user_name.$avatar');";
             if (mysqli_query($con, $query)) {
                 header("Location: list.php");
                 exit;
@@ -113,8 +129,18 @@
 
         <label>avatar :
             <input type="file" name="avatar">
-            <?php if (in_array("file_size", $error_fields))
-                echo "* Please enter a file size not bigger then 6MB"; ?>
+            <?php if (in_array("empty", $error_fields)) {
+                echo "* No File Uploaded!";
+            } else {
+                if (in_array("file_size", $error_fields)) {
+                    echo "* Please enter a file size not bigger then 6MB";
+                }
+                if (in_array("not_valid", $error_fields)) {
+                    echo "* File is Not Valid";
+                }
+            }
+
+            ?>
         </label><br>
 
         <input type="submit" value="Add">

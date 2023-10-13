@@ -9,7 +9,7 @@ if (!$con) {
 
 //Select the user $_GET['id']
 $id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_NUMBER_INT);
-$query = "DELETE FROM listpro WHERE `listpro`.`id` = " . $id . " LIMIT 1;";
+$query = "DELETE FROM userlist WHERE `userlist`.`id` = " . $id . " LIMIT 1;";
 if (mysqli_query($con, $query)) {
     header("Location: list.php");
     exit;
