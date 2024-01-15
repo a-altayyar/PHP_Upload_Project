@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'):
             if (empty($errors)):
 
                 // Move The Files
-                $uploads_dir = $_SERVER['DOCUMENT_ROOT'] . '\My_Projects\project_php_upload\img\Photo_Library\\';
+                $uploads_dir = $_SERVER['DOCUMENT_ROOT'] . '\PHP_Upload_Project\img\Photo_Library\\';
                 move_uploaded_file($file_tmp[$i], "$uploads_dir/$file_name[$i]" . "$file_random[$i]");
 
                 // Success Massage
