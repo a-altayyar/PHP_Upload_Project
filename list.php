@@ -54,6 +54,8 @@
                 <th>Id</th>
                 <th>Name</th>
                 <th>Email</th>
+                <th>Profile Image</th>
+                <th>Photos</th>
                 <th>Admin</th>
                 <th>Actions</th>
             </tr>
@@ -75,16 +77,20 @@
                     </td>
                     <td>
                         <?php if (!empty($row['avatar'])) { ?>
-                            <img src="./uploads/<?= $row['avatar'] ?>" style="width: 100px; height: 100px" />
+                            <img src="./img/Photo_Personal/<?= $row['avatar'] ?>" style="width: 100px; height: 100px" />
                         <?php } else { ?>
-                            <img src="./uploads/nothing_img.png" style="width: 100px; height: 100px" />
+                            <img src="./img/Photo_Personal/nothing_img.png" style="width: 100px; height: 100px" />
                         <?php } ?>
+                    </td>
+                    <td>
+                        <a href="photos.php?id=<?= $row['id'] ?>">Your Photos</a>
                     </td>
                     <td>
                         <?= ($row['admin']) ? 'Yes' : 'No' ?>
                     </td>
                     <td> <a href="edit.php?id=<?= $row['id'] ?>">Edit</a> | <a
-                            href="delete.php?id=<?= $row['id'] ?>">Delete</a> </td>
+                            href="delete.php?id=<?= $row['id'] ?>">Delete</a>
+                    </td>
                 </tr>
 
                 <?php

@@ -78,7 +78,7 @@
             $user_password = password_hash(trim($_POST['add_psw']), PASSWORD_DEFAULT);
             $admin = (isset($_POST['add_admin'])) ? 1 : 0;
 
-            $uploads_dir = $_SERVER['DOCUMENT_ROOT'] . '\My_Projects\project_php_upload\uploads\\';
+            $uploads_dir = $_SERVER['DOCUMENT_ROOT'] . '\My_Projects\project_php_upload\img\Photo_Personal\\';
             $avatar = '';
             if ($_FILES["avatar"]['error'] == UPLOAD_ERR_OK) {
                 $tmp_name = $_FILES["avatar"]["tmp_name"];
